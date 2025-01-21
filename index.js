@@ -1,30 +1,34 @@
 /**
- * @todo
- * @error
- * for (var [key, val] of Object.entries(this)) {
- * TypeError: Cannot convert undefined or null to object
+ * @version 1
  */
 Object.defineProperty(
   Object.prototype,
   'iter',
   {
-    value: (callback) => () => {
-      for (var [ key, val ] of Object.entries(this)) {
-        callback(key, val);
-      };
+    value: function (callback) {
+      var obj = this;
+      return function() {
+        for (var [key, val] of Object.entries(obj)) {
+          callback(key, val);
+        };
+      }
     },
     writable: false,
   }
 );
 
+/**
+ * @version 2
+ */
 Object.defineProperty(
   Object.prototype,
   'newIter',
   {
-    value: (callback) => () => {
-      for (var key in this) {
-        if (this.hasOwnProperty(key)) {
-          callback(key, this[key]);
+    value: function (callback) {
+      var obj = this;
+      return function () {
+        for (var key in obj) {
+          callback(key, obj[key]);
         }
       }
     },
@@ -43,10 +47,10 @@ var obj = {
   },
 };
 
-/**
- * @todo
- * not logging the result
- */
-const newIter = obj.iter(
+const iter = obj.iter(
+  (...args) => console.log(args)
+)();
+
+const newIter = obj.newIter(
   (...args) => console.log(args)
 )();
